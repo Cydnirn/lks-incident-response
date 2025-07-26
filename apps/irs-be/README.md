@@ -55,10 +55,9 @@ docker build \
   --no-cache \
   -t irsbe \
   -f docker/Dockerfile \
-  --build-arg VITE_AWS_REGION=us-east-1 \
-  --build-arg VITE_AWS_ACCESS_KEY_ID=your_aws_key_id. \
-  --build-arg VITE_AWS_SECRET_ACCESS_KEY=your_aws_secret \
-  --build-arg VITE_AWS_SESSION_TOKEN=you_aws_token
+  --build-arg AWS_ACCESS_KEY_ID=your_aws_key_id. \
+  --build-arg AWS_SECRET_ACCESS_KEY=your_aws_secret \
+  --build-arg AWS_SESSION_TOKEN=you_aws_token
   .
 
 ## API Endpoints
