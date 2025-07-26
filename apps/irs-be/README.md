@@ -54,7 +54,7 @@ The server will start on `http://localhost:8080` (or the port specified in your 
 docker build \
   --platform=linux/amd64 \
   --no-cache \
-  -t irsbe \
+  -t lks/irsbe \
   .
 ```
 ### With AWS Credential
@@ -63,7 +63,7 @@ docker build \
 docker build \
   --platform=linux/amd64 \
   --no-cache \
-  -t irsbe \
+  -t lks/irsbe \
   --build-arg AWS_ACCESS_KEY_ID=your_aws_key_id. \
   --build-arg AWS_SECRET_ACCESS_KEY=your_aws_secret \
   --build-arg AWS_SESSION_TOKEN=you_aws_token
