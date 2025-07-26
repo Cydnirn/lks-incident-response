@@ -8,9 +8,14 @@ output "vpc_cidr_block" {
   value       = aws_vpc.lks_vpc.cidr_block
 }
 
-output "public_subnet_id" {
-  description = "ID of the public subnet"
-  value       = aws_subnet.public_subnet.id
+output "public_subnet_1_id" {
+  description = "ID of the public subnet 1"
+  value       = aws_subnet.public_subnet_1.id
+}
+
+output "public_subnet_2_id" {
+  description = "ID of the public subnet 2"
+  value       = aws_subnet.public_subnet_2.id
 }
 
 output "private_subnet_1_id" {

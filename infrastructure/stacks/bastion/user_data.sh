@@ -80,7 +80,8 @@ services:
       # Required:
       # Change this to your host's public address
       - WG_HOST=${wg_host}
-      - PASSWORD_HASH=$$2a$$12$$8PtK.pNSIcSu02vpUvK3sOxcIDG5rjI6z/nTC4Gm7PSmRxl9Gqcjm
+      # The default password is lkspass
+      - PASSWORD_HASH=\$\$2a\$\$12\$\$OEDu7fC0asOCim1iXyy/4.sgI9T8fPomOBkjlXNffk4rJaIut8FvK
       - WG_PORT=51820
       - WG_DEFAULT_ADDRESS=10.200.0.x
       - WG_DEFAULT_DNS=1.1.1.1,8.8.8.8
@@ -148,6 +149,9 @@ EOF
 # Cleanup
 apt-get autoremove -y
 apt-get autoclean
+
+# Disable UFW
+ufw disable
 
 # Log completion
 echo "$(date): Bastion NAT instance with WireGuard setup completed" >> /var/log/user-data.log

@@ -30,6 +30,9 @@ EOF
 chmod +x /home/ubuntu/test_ollama.sh
 chown ubuntu:ubuntu /home/ubuntu/test_ollama.sh
 
+# Disable UFW
+ufw disable
+
 # Create a systemd service for Ollama (already handled by installer)
 # The installer creates /etc/systemd/system/ollama.service
 

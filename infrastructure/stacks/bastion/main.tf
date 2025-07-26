@@ -51,7 +51,14 @@ module "bastion_sg" {
       to_port     = 51820
       protocol    = "udp"
       cidr_blocks = ["0.0.0.0/0"]
-    }
+    },
+    {
+      description = "All ports TCP from local network for NAT"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = [data.terraform_remote_state.base.outputs.vpc_cidr_block]
+    },
   ]
   
   egress_rules = [

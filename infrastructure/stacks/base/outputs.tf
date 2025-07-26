@@ -9,9 +9,14 @@ output "vpc_cidr_block" {
   value       = module.vpc.vpc_cidr_block
 }
 
-output "public_subnet_id" {
-  description = "ID of the public subnet"
-  value       = module.vpc.public_subnet_id
+output "public_subnet_1_id" {
+  description = "ID of the public subnet 1"
+  value       = module.vpc.public_subnet_1_id
+}
+
+output "public_subnet_2_id" {
+  description = "ID of the public subnet 2"
+  value       = module.vpc.public_subnet_2_id
 }
 
 output "private_subnet_1_id" {

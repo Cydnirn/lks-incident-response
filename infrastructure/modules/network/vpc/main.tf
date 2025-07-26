@@ -23,16 +23,31 @@ resource "aws_internet_gateway" "lks_igw" {
 }
 
 # Public Subnet
-resource "aws_subnet" "public_subnet" {
+resource "aws_subnet" "public_subnet_1" {
   vpc_id                  = aws_vpc.lks_vpc.id
-  cidr_block              = var.public_subnet_cidr
+  cidr_block              = var.public_subnet_1_cidr
   availability_zone       = var.availability_zone_1
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "${var.project_name}-public-subnet"
+    Name = "${var.project_name}-public-subnet-1"
     Project = var.project_name
     Owner = "lks-team"
+    "kubernetes.io/role/elb" = "1"
+  }
+}
+
+resource "aws_subnet" "public_subnet_2" {
+  vpc_id                  = aws_vpc.lks_vpc.id
+  cidr_block              = var.public_subnet_2_cidr
+  availability_zone       = var.availability_zone_2
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-subnet-2"
+    Project = var.project_name
+    Owner = "lks-team"
+    "kubernetes.io/role/elb" = "1"
   }
 }
 
@@ -80,7 +95,12 @@ resource "aws_route_table" "public_rt" {
 
 # Route Table Association for Public Subnet
 resource "aws_route_table_association" "public_rta" {
-  subnet_id      = aws_subnet.public_subnet.id
+  subnet_id      = aws_subnet.public_subnet_1.id
+  route_table_id = aws_route_table.public_rt.id
+}
+
+resource "aws_route_table_association" "public_rta_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id
   route_table_id = aws_route_table.public_rt.id
 }
 
