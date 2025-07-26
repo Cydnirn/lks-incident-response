@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# Variables
-WG_PORT="${wg_port}"
-
-WG_HOST=$(curl -s http://checkip.amazonaws.com)
-echo "Detected public IP: $WG_HOST"
-
 # System Update
 apt-get update -y
 apt-get upgrade -y
@@ -85,9 +79,9 @@ services:
       - LANG=en
       # Required:
       # Change this to your host's public address
-      - WG_HOST=$WG_HOST
-      - PASSWORD_HASH=$$2a$12$8PtK.pNSIcSu02vpUvK3sOxcIDG5rjI6z/nTC4Gm7PSmRxl9Gqcjm
-      - WG_PORT=$WG_PORT
+      - WG_HOST=${wg_host}
+      - PASSWORD_HASH=$$2a$$12$$8PtK.pNSIcSu02vpUvK3sOxcIDG5rjI6z/nTC4Gm7PSmRxl9Gqcjm
+      - WG_PORT=51820
       - WG_DEFAULT_ADDRESS=10.200.0.x
       - WG_DEFAULT_DNS=1.1.1.1,8.8.8.8
       - WG_MTU=1420

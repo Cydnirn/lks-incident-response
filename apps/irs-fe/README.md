@@ -36,16 +36,7 @@ A modern read-only web application specifically designed for monitoring and trac
    
    Create a `.env` file in the root directory:
    ```env
-   # AWS Configuration (optional for development)
-   VITE_AWS_REGION=us-east-1
-   VITE_AWS_ACCESS_KEY_ID=your_access_key_here
-   VITE_AWS_SECRET_ACCESS_KEY=your_secret_key_here
-   VITE_AWS_SESSION_TOKEN=your_session_token_here
-   VITE_DYNAMODB_TABLE_NAME=incident
-   
-   # Development Settings
-   # If true will be use mockdata not real data, becareful!
-   VITE_USE_MOCK_DATA=false 
+   VITE_API_BASE_URL=http://your_be_service
    ```
 
    **Attention:** The environment will not function outside of the build phase, except in development mode.
@@ -74,10 +65,7 @@ docker build \
   --no-cache \
   -t lks/irs \
   -f docker/Dockerfile \
-  --build-arg VITE_AWS_REGION=us-east-1 \
-  --build-arg VITE_AWS_ACCESS_KEY_ID=your_aws_key_id. \
-  --build-arg VITE_AWS_SECRET_ACCESS_KEY=your_aws_secret \
-  --build-arg VITE_AWS_SESSION_TOKEN=you_aws_token
+  --build-arg VITE_API_BASE_URL=http://YOUR_BE_SERVICE
   .
 ```
 **Note:** Run in root folder of IRS or apps/irs

@@ -87,9 +87,9 @@ module "bastion" {
   root_volume_size      = var.bastion_root_volume_size
   root_volume_type      = var.bastion_root_volume_type
   root_volume_encrypted = var.bastion_root_volume_encrypted
-  associate_public_ip_address = true
+  create_eip            = true
   user_data             = templatefile("${path.module}/user_data.sh", {
-    wg_port             = "51820" 
+    wg_host             = module.bastion.instance_eip
   })
 }
 

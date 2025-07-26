@@ -43,6 +43,9 @@ COPY --from=builder /app/dist .
 # Copy nginx configuration
 COPY docker/config/nginx.conf /etc/nginx/nginx.conf
 
+# Create a template for the index.html file
+RUN mv /usr/share/nginx/html/index.html /usr/share/nginx/html/index.html.template
+
 # Set permissions
 RUN chmod -R 755 /usr/share/nginx/html
 
@@ -50,4 +53,5 @@ RUN chmod -R 755 /usr/share/nginx/html
 EXPOSE 8080
 
 # Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/index.html.template > /usr/share/nginx/html/index.html && nginx -g 'daemon off;'"]
