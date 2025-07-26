@@ -23,7 +23,16 @@ images:
   newName: betuah/loadsim
   newTag: latest
 
-patchesStrategicMerge:
-- deployment-patch.yaml
-- hpa-patch.yaml
-- ingress-patch.yaml 
+patches:
+- path: deployment-patch.yaml
+  target:
+    kind: Deployment
+    name: loadsim-app
+- path: hpa-patch.yaml
+  target:
+    kind: HorizontalPodAutoscaler
+    name: loadsim-hpa
+- path: ingress-patch.yaml
+  target:
+    kind: Ingress
+    name: loadsim-ingress 

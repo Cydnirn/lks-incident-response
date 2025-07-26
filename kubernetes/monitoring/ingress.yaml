@@ -1,20 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: lks-irs-be-ingress
+  name: lks-irs-ingress
   namespace: monitoring
   labels:
-    app: lks-irs-be
+    app: lks-irs-ingress
     environment: monitoring
-  annotations:
-    kubernetes.io/ingress.class: "alb"
-    alb.ingress.kubernetes.io/scheme: "internet-facing"
-    alb.ingress.kubernetes.io/target-type: "ip"
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-    alb.ingress.kubernetes.io/healthcheck-path: "/health"
-    alb.ingress.kubernetes.io/healthcheck-port: "8080"
-    alb.ingress.kubernetes.io/success-codes: "200,302"
+  # annotations:
+  #   # kubernetes.io/ingress.class: "alb"
+  #   alb.ingress.kubernetes.io/scheme: "internet-facing"
+  #   alb.ingress.kubernetes.io/target-type: "ip"
+  #   alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+  #   # alb.ingress.kubernetes.io/healthcheck-path: "/health"
+  #   # alb.ingress.kubernetes.io/healthcheck-port: "8080"
+  #   # alb.ingress.kubernetes.io/success-codes: "200,302"
 spec:
+  ingressClassName: alb
   rules:
   - http:
       paths:

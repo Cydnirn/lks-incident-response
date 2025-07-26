@@ -86,14 +86,19 @@ kubectl config get-contexts                  # Get all context
 kubectl config current-context               # Get current context
 kubectl config use-context <context-name>    # Switch context
 kubectl config delete-context <context-name> # Delete context
+
+# Apply or deploy kubernetes resource
+kubectl apply -k monitoring
+kubectl apply -k overlay/production
+kubectl apply -k overlay/staging
 ```
 
-### ECR Secret
+### ECR Secret for EKS
 ```bash
 kubectl create secret docker-registry ecr-secret \
-  --docker-server=<aws_account_id>.dkr.ecr.<region>.amazonaws.com \
+  --docker-server=472634532065.dkr.ecr.us-east-1.amazonaws.com \
   --docker-username=AWS \
-  --docker-password=$(aws ecr get-login-password --region your-region) \
+  --docker-password=$(aws ecr get-login-password --region us-east-1) \
   --docker-email=none
 ```
 

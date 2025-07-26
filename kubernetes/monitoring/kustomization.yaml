@@ -5,6 +5,9 @@ resources:
 - irs-be
 - irs-fe
 - ingress.yaml
+- ingressclassparams-alb.yaml
+- ingressclass-alb.yaml
+
 
 images:
   - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsbe
