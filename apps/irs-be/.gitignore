@@ -29,7 +29,8 @@ Thumbs.db
 
 # Build directories
 bin/
-cmd/irs-be/irs-be
+irs-be
+irs-backend
 
 # Logs
 *.log
