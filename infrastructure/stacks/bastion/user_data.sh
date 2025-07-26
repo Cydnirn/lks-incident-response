@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # Variables
-WG_HOST="${wg_host}"
 WG_PORT="${wg_port}"
+
+WG_HOST=$(curl -s http://checkip.amazonaws.com)
+echo "Detected public IP: $WG_HOST"
 
 # System Update
 apt-get update -y
@@ -75,7 +77,7 @@ mkdir -p /opt/wireguard-easy
 cd /opt/wireguard-easy
 
 # Create docker-compose.yml for WG-Easy
-cat > docker-compose.yml << EOF
+cat > docker-compose.yml <<EOF
 services:
   wg-easy:
     environment:

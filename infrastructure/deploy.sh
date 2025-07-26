@@ -110,7 +110,7 @@ plan_stack() {
 show_status() {
     print_status "Checking status of all stacks..."
     
-    for stack in base bastion ollama; do
+    for stack in base bastion llm; do
         local stack_path="stacks/$stack"
         if [ -d "$stack_path" ]; then
             cd "$stack_path"
@@ -145,13 +145,13 @@ show_usage() {
     echo "Stacks:"
     echo "  base              Base infrastructure (VPC, Security Groups)"
     echo "  bastion           Bastion host with NAT gateway"
-    echo "  ollama            Ollama AI/ML compute instance"
+    echo "  llm               LLM compute instance"
     echo "  all               All stacks (deploy/destroy only)"
     echo ""
     echo "Examples:"
     echo "  $0 deploy base"
     echo "  $0 deploy all"
-    echo "  $0 destroy ollama"
+    echo "  $0 destroy llm"
     echo "  $0 plan bastion"
 }
 
@@ -169,13 +169,13 @@ main() {
                 "bastion")
                     deploy_stack "bastion"
                     ;;
-                "ollama")
-                    deploy_stack "ollama"
+                "llm")
+                    deploy_stack "llm"
                     ;;
                 "all")
                     deploy_stack "base"
                     deploy_stack "bastion"
-                    deploy_stack "ollama"
+                    deploy_stack "llm"
                     ;;
                 *)
                     print_error "Invalid stack: $stack"
@@ -191,7 +191,7 @@ main() {
                     read -p "Are you sure? (y/N): " -n 1 -r
                     echo
                     if [[ $REPLY =~ ^[Yy]$ ]]; then
-                        destroy_stack "ollama"
+                        destroy_stack "llm"
                         destroy_stack "bastion"
                         destroy_stack "base"
                     else
@@ -201,15 +201,15 @@ main() {
                 "bastion")
                     destroy_stack "bastion"
                     ;;
-                "ollama")
-                    destroy_stack "ollama"
+                "llm")
+                    destroy_stack "llm"
                     ;;
                 "all")
                     print_warning "This will destroy ALL infrastructure!"
                     read -p "Are you sure? (y/N): " -n 1 -r
                     echo
                     if [[ $REPLY =~ ^[Yy]$ ]]; then
-                        destroy_stack "ollama"
+                        destroy_stack "llm"
                         destroy_stack "bastion"
                         destroy_stack "base"
                     else
@@ -225,7 +225,7 @@ main() {
             ;;
         "plan")
             case $stack in
-                "base"|"bastion"|"ollama")
+                "base"|"bastion"|"llm")
                     plan_stack "$stack"
                     ;;
                 *)

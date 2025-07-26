@@ -92,14 +92,8 @@ module "ollama" {
   root_volume_encrypted = var.llm_root_volume_encrypted
   associate_public_ip_address = true
   user_data = templatefile("${path.module}/user_data.sh", {
-    llm_model = var.llm_model
+    ollama_model = var.llm_model
   })
-  tags = {
-    Name    = "${var.project_name}-llm-host"
-    Project = var.project_name
-    Service = "llm"
-    Owner   = "lks-team"
-  }
   
   # Implicit dependency on bastion to ensure NAT routing is ready
   # This ensures the bastion instance is fully created before creating ollama

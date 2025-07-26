@@ -5,7 +5,7 @@ output "bastion_instance_id" {
 
 output "bastion_public_ip" {
   description = "Public IP of the bastion host"
-  value       = module.bastion.instance_eip
+  value       = module.bastion.instance_public_ip
 }
 
 output "bastion_private_ip" {
@@ -25,5 +25,5 @@ output "bastion_ssh_command" {
 
 output "wireguard_ui_url" {
   description = "URL to access WireGuard UI"
-  value       = "http://${module.bastion.instance_eip}:51821"
+  value       = "http://${module.bastion.instance_public_ip}:51821"
 } 
