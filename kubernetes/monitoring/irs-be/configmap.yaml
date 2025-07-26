@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lks-irs-be-config
+  namespace: monitoring
+  labels:
+    app: lks-irs-be
+    environment: monitoring
+data:
+  AWS_REGION: "us-east-1"
+  DYNAMODB_TABLE_NAME: "insident"

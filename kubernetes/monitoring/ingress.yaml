@@ -1,10 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: lks-irs-ingress
+  name: lks-irs-be-ingress
   namespace: monitoring
   labels:
-    app: lks-irs
+    app: lks-irs-be
     environment: monitoring
   annotations:
     kubernetes.io/ingress.class: "alb"
@@ -22,6 +22,15 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: lks-irs-service
+            name: lks-irs-fe-service
             port:
-              number: 80 
+              number: 8080
+  - http:
+      paths:
+      - path: /api/v1/
+        pathType: Prefix
+        backend:
+          service:
+            name: lks-irs-be-service
+            port:
+              number: 8080

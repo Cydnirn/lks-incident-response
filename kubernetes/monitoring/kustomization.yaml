@@ -2,19 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-- namespace.yaml
-- deployment.yaml
-- service.yaml
-- configmap.yaml
-- secret.yaml
-- hpa.yaml
+- irs-be
+- irs-fe
 - ingress.yaml
 
 images:
-- name: nginx
-  newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/loadsim
-  newTag: latest
+  - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-be
+    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-be
+    newTag: latest
+  - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-fe
+    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-fe
+    newTag: latest
 
 commonLabels:
-  app: lks-irs
-  environment: monitoring 
+  app: lks-monitoring
+  environment: monitoring   

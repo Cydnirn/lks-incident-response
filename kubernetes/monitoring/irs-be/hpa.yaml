@@ -1,18 +1,18 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: lks-irs-hpa
+  name: lks-irs-be-hpa
   namespace: monitoring
   labels:
-    app: lks-irs
+    app: lks-irs-be
     environment: monitoring
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: lks-irs
-  minReplicas: 3
-  maxReplicas: 5
+    name: lks-irs-be
+  minReplicas: 1
+  maxReplicas: 3
   metrics:
   - type: Resource
     resource:

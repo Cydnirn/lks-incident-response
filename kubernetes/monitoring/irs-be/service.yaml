@@ -1,17 +1,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: lks-irs-service
+  name: lks-irs-be-service
   namespace: monitoring
   labels:
-    app: lks-irs
+    app: lks-irs-be
     environment: monitoring
 spec:
   type: ClusterIP
   ports:
-  - port: 80
+  - port: 8080
     targetPort: 8080
     protocol: TCP
     name: http
   selector:
-    app: lks-irs 
+    app: lks-irs-be 
