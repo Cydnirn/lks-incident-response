@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lks-apps-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadsim-app
+  template:
+    spec:
+      containers:
+      - name: app-production
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "512m"
+          limits:
+            memory: "1024Mi"
+            cpu: "512m" 

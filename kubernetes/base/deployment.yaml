@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loadsim-app
+  labels:
+    app: loadsim-app
+    environment: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loadsim-app
+  template:
+    metadata:
+      labels:
+        app: loadsim-app
+        environment: apps
+    spec:
+      containers:
+      - name: app
+        image: betuah/loadsim:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: loadsim-config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "512m"
+          limits:
+            memory: "512Mi"
+            cpu: "512m"
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5 

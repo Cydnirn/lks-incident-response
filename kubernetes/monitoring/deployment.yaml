@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lks-irs
+  namespace: monitoring
+  labels:
+    app: lks-irs
+    environment: monitoring
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lks-irs
+  template:
+    metadata:
+      labels:
+        app: lks-irs
+        environment: monitoring
+    spec:
+      imagePullSecrets:
+      - name: ecr-secret
+      containers:
+      - name: irs-app
+        image: nginx:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: lks-irs-config
+        - secretRef:
+            name: lks-irs-secret
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5 

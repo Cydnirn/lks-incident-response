@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lks-irs-config
+  namespace: monitoring
+  labels:
+    app: lks-irs
+    environment: monitoring
+data:
+  VITE_DYNAMODB_TABLE_NAME: "insident"
+  VITE_USE_MOCK_DATA: "false"
+  VITE_DYNAMODB_REGION: "us-east-1"
