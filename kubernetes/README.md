@@ -79,6 +79,13 @@ kubectl kustomize monitoring/
 kubectl port-forward service/lks-apps-stage-service 8080:8080 -n staging
 kubectl port-forward service/lks-apps-prod-service 8081:8080 -n production
 kubectl port-forward service/lks-irs-service 8082:8080 -n monitoring
+
+# Get Cluster Context
+aws eks update-kubeconfig --region <region> --name <cluster-name>
+kubectl config get-contexts                  # Get all context
+kubectl config current-context               # Get current context
+kubectl config use-context <context-name>    # Switch context
+kubectl config delete-context <context-name> # Delete context
 ```
 
 ### ECR Secret

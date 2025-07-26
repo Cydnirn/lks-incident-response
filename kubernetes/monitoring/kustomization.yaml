@@ -7,13 +7,16 @@ resources:
 - ingress.yaml
 
 images:
-  - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-be
-    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-be
+  - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsbe
+    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsbe
     newTag: latest
-  - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-fe
-    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irs-fe
+  - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsfe
+    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsfe
     newTag: latest
 
-commonLabels:
-  app: lks-monitoring
-  environment: monitoring   
+labels:
+  - includeSelectors: true
+    includeTemplates: true
+    pairs:
+      app: lks-monitoring
+      environment: monitoring   

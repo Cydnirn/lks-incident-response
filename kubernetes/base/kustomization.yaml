@@ -6,10 +6,12 @@ resources:
 - deployment.yaml
 - service.yaml
 - configmap.yaml
-- secret.yaml
 - hpa.yaml
 - ingress.yaml  
 
-commonLabels:
-  app: lks-apps
-  environment: apps 
+labels:
+  - includeSelectors: true
+    includeTemplates: true
+    pairs:
+      app: lks-apps
+      environment: apps 
