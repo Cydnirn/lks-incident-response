@@ -69,6 +69,12 @@ variable "user_data" {
   default     = null
 }
 
+variable "associate_public_ip_address" {
+  description = "Whether to associate a public IP address with the instance"
+  type        = bool
+  default     = false
+}
+
 variable "create_eip" {
   description = "Whether to create an Elastic IP for the instance"
   type        = bool

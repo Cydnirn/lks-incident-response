@@ -6,6 +6,8 @@ resource "aws_vpc" "lks_vpc" {
 
   tags = {
     Name = "${var.project_name}-vpc"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -15,6 +17,8 @@ resource "aws_internet_gateway" "lks_igw" {
 
   tags = {
     Name = "${var.project_name}-igw"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -27,6 +31,8 @@ resource "aws_subnet" "public_subnet" {
 
   tags = {
     Name = "${var.project_name}-public-subnet"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -38,6 +44,8 @@ resource "aws_subnet" "private_subnet_1" {
 
   tags = {
     Name = "${var.project_name}-private-subnet-1"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -49,6 +57,8 @@ resource "aws_subnet" "private_subnet_2" {
 
   tags = {
     Name = "${var.project_name}-private-subnet-2"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -63,6 +73,8 @@ resource "aws_route_table" "public_rt" {
 
   tags = {
     Name = "${var.project_name}-public-rt"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 

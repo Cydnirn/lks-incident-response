@@ -7,6 +7,7 @@ resource "aws_instance" "instance" {
   subnet_id              = var.subnet_id
   iam_instance_profile   = var.iam_instance_profile
   source_dest_check      = var.source_dest_check
+  associate_public_ip_address = var.associate_public_ip_address
 
   root_block_device {
     volume_size = var.root_volume_size
@@ -19,6 +20,8 @@ resource "aws_instance" "instance" {
   tags = merge(
     {
       Name = "${var.project_name}-${var.instance_name}"
+      Project = var.project_name
+      Owner = "lks-team"
     },
     var.tags
   )

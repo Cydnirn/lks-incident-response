@@ -14,13 +14,6 @@ provider "aws" {
 
 # Common tags and security group rules
 locals {
-  common_tags = {
-    Project     = var.project_name
-    Environment = "dev"
-    ManagedBy   = "terraform"
-    Owner       = "lks-team"
-  }
-
   # Security group rules configuration (only common ones)
   security_group_rules = {
     # Local Access Rules (for private instances)
@@ -94,24 +87,22 @@ module "local_access_sg" {
   source = "../../modules/network/security-group"
 
   project_name        = var.project_name
-  security_group_name = "local-access"
+  security_group_name = "local-access-sg"
   security_group_type = "local-access"
   description         = "Security group for local access services"
   vpc_id              = module.vpc.vpc_id
   ingress_rules       = local.security_group_rules.local_access.ingress
   egress_rules        = local.security_group_rules.local_access.egress
-  common_tags         = local.common_tags
 }
 
 module "database_sg" {
   source = "../../modules/network/security-group"
 
   project_name        = var.project_name
-  security_group_name = "database"
+  security_group_name = "database-sg"
   security_group_type = "database"
   description         = "Security group for database services"
   vpc_id              = module.vpc.vpc_id
   ingress_rules       = local.security_group_rules.database.ingress
   egress_rules        = local.security_group_rules.database.egress
-  common_tags         = local.common_tags
 } 

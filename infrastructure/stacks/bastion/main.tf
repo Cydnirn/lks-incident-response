@@ -25,7 +25,7 @@ module "bastion_sg" {
   source = "../../modules/network/security-group"
 
   project_name        = var.project_name
-  security_group_name = "bastion"
+  security_group_name = "bastion-sg"
   security_group_type = "bastion"
   description         = "Security group for bastion host"
   vpc_id              = data.terraform_remote_state.base.outputs.vpc_id
@@ -64,11 +64,10 @@ module "bastion_sg" {
     }
   ]
   
-  common_tags = {
-    Project     = var.project_name
-    Environment = "dev"
-    Service     = "bastion"
-    ManagedBy   = "terraform"
+  tags = {
+    Name = "${var.project_name}-bastion-sg"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -77,7 +76,7 @@ module "bastion" {
   source = "../../modules/compute/ec2"
   
   project_name          = var.project_name
-  instance_name         = "bastion"
+  instance_name         = "bastion-host"
   ami                   = var.bastion_ami
   instance_type         = var.bastion_instance_type
   key_name              = var.bastion_key_name
@@ -88,7 +87,7 @@ module "bastion" {
   root_volume_size      = var.bastion_root_volume_size
   root_volume_type      = var.bastion_root_volume_type
   root_volume_encrypted = var.bastion_root_volume_encrypted
-  create_eip            = true
+  associate_public_ip_address = true
   user_data             = templatefile("${path.module}/user_data.sh", {
     wg_admin_password   = var.wg_admin_password
     wg_host             = module.bastion.instance_eip
@@ -107,6 +106,8 @@ resource "aws_route_table" "private_rt_with_nat" {
 
   tags = {
     Name = "${var.project_name}-private-rt-nat"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 

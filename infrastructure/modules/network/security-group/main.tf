@@ -7,6 +7,8 @@ locals {
     {
       Name = "${var.project_name}-${var.security_group_name}"
       Type = var.security_group_type
+      Project = var.project_name
+      Owner = "lks-team"
     },
     var.common_tags,
     var.tags

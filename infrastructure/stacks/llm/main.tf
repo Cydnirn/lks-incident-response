@@ -29,12 +29,12 @@ data "terraform_remote_state" "bastion" {
 }
 
 # Ollama Security Group
-module "ollama_sg" {
+module "llm_sg" {
   source = "../../modules/network/security-group"
 
   project_name        = var.project_name
-  security_group_name = "ollama"
-  security_group_type = "ollama"
+  security_group_name = "llm-sg"
+  security_group_type = "llm"
   description         = "Security group for Ollama instance"
   vpc_id              = data.terraform_remote_state.base.outputs.vpc_id
   
@@ -51,7 +51,7 @@ module "ollama_sg" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      security_groups = [data.terraform_remote_state.bastion.outputs.bastion_security_group_id]
+      cidr_blocks = [data.terraform_remote_state.base.outputs.vpc_cidr_block]
     }
   ]
   
@@ -65,11 +65,10 @@ module "ollama_sg" {
     }
   ]
   
-  common_tags = {
-    Project     = var.project_name
-    Environment = "dev"
-    Service     = "ollama"
-    ManagedBy   = "terraform"
+  tags = {
+    Name = "${var.project_name}-llm-sg"
+    Project = var.project_name
+    Owner = "lks-team"
   }
 }
 
@@ -77,26 +76,33 @@ module "ollama_sg" {
 module "ollama" {
   source = "../../modules/compute/ec2"
   
-  project_name     = var.project_name
-  instance_name    = "ollama"
-  ami              = var.ollama_ami
-  instance_type    = var.ollama_instance_type
-  key_name         = var.ollama_key_name
-  security_group_ids = [
+  project_name           = var.project_name
+  instance_name          = "llm-host"
+  ami                   = var.llm_ami
+  instance_type         = var.llm_instance_type
+  key_name              = var.llm_key_name
+  security_group_ids    = [
     data.terraform_remote_state.base.outputs.local_access_security_group_id,
-    module.ollama_sg.security_group_id
+    module.llm_sg.security_group_id
   ]
-  subnet_id        = data.terraform_remote_state.base.outputs.private_subnet_1_id
-  iam_instance_profile = "LabInstanceProfile"
-  root_volume_size = var.ollama_root_volume_size
-  root_volume_type = var.ollama_root_volume_type
-  root_volume_encrypted = var.ollama_root_volume_encrypted
-  create_eip       = true
-  user_data        = templatefile("${path.module}/user_data.sh", {
-    ollama_model = var.ollama_model
+  subnet_id             = data.terraform_remote_state.base.outputs.private_subnet_1_id
+  iam_instance_profile  = "LabInstanceProfile"
+  root_volume_size      = var.llm_root_volume_size
+  root_volume_type      = var.llm_root_volume_type
+  root_volume_encrypted = var.llm_root_volume_encrypted
+  associate_public_ip_address = true
+  user_data = templatefile("${path.module}/user_data.sh", {
+    llm_model = var.llm_model
   })
+  tags = {
+    Name    = "${var.project_name}-llm-host"
+    Project = var.project_name
+    Service = "llm"
+    Owner   = "lks-team"
+  }
   
-  # Explicit dependency on bastion to ensure NAT routing is ready
+  # Implicit dependency on bastion to ensure NAT routing is ready
+  # This ensures the bastion instance is fully created before creating ollama
   depends_on = [
     data.terraform_remote_state.bastion
   ]
