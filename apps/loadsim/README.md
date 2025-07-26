@@ -5,11 +5,12 @@ This is a Go application to simulate CPU and memory load for testing resource us
 ## Features
 
 - Simulate CPU load up to 80% across all CPU cores.
-- Simulate memory load in GB.
+- Simulate memory load in MB.
 - Control load duration or run continuously until stopped.
 - HTTP API endpoints to start, stop, check status, update settings.
 - Health check endpoint.
 - Database connection check for MySQL, PostgreSQL, SQLite, and DynamoDB.
+- Automatic crash and shutdown simulation for testing CrashLoopBackOff and rolling updates.
 - Usage instructions available at the root endpoint `/`.
 
 ## Building and Running
@@ -46,14 +47,25 @@ docker build -t loadsim .
 ```bash
 docker run -p 8080:8080 \
   -e CPU_LOAD_PERCENT=50 \
-  -e MEMORY_GB=1.5 \
+  -e MEMORY_MB=1536 \
   -e DURATION_SEC=0 \
+  -e CRASH=false \
+  -e CRASH_AFTER_TIME_MS=5000 \
+  -e SHUTDOWN=false \
+  -e SHUTDOWN_AFTER_TIME_MS=10000 \
   loadsim
 ```
 
+## Environment Variables
+
 - `CPU_LOAD_PERCENT`: Target CPU load percentage (max 80).
-- `MEMORY_GB`: Target memory load in GB.
+- `MEMORY_MB`: Target memory load in MB.
 - `DURATION_SEC`: Duration in seconds to run the load. 0 means run until stopped.
+- `PORT`: Server port (default: 8080).
+- `CRASH`: Boolean to enable automatic crash simulation (default: false).
+- `CRASH_AFTER_TIME_MS`: Time in milliseconds before auto-crash (default: 5000ms).
+- `SHUTDOWN`: Boolean to enable automatic shutdown simulation (default: false).
+- `SHUTDOWN_AFTER_TIME_MS`: Time in milliseconds before auto-shutdown (default: 10000ms).
 
 ## API Endpoints
 
@@ -82,7 +94,7 @@ curl http://localhost:8080/status
 Update settings:
 
 ```bash
-curl -X POST http://localhost:8080/setting -H "Content-Type: application/json" -d '{"cpu_load_percent":40,"memory_gb":2,"duration_sec":60}'
+curl -X POST http://localhost:8080/setting -H "Content-Type: application/json" -d '{"cpu_load_percent":40,"memory_mb":2048,"duration_sec":60}'
 ```
 
 Health check:

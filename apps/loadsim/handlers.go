@@ -49,9 +49,9 @@ func rootHandler(c *fiber.Ctx) error {
 	if cpuLoadEnv == "" {
 		cpuLoadEnv = "(not set, using default)"
 	}
-	memGBEnv := os.Getenv("MEMORY_GB")
-	if memGBEnv == "" {
-		memGBEnv = "(not set, using default)"
+	memMBEnv := os.Getenv("MEMORY_MB")
+	if memMBEnv == "" {
+		memMBEnv = "(not set, using default)"
 	}
 	durationEnv := os.Getenv("DURATION_SEC")
 	if durationEnv == "" {
@@ -65,9 +65,17 @@ func rootHandler(c *fiber.Ctx) error {
 	if crashEnv == "" {
 		crashEnv = "(not set, using default)"
 	}
+	crashTimeEnv := os.Getenv("CRASH_AFTER_TIME_MS")
+	if crashTimeEnv == "" {
+		crashTimeEnv = "(not set, using default)"
+	}
 	shutdownEnv := os.Getenv("SHUTDOWN")
 	if shutdownEnv == "" {
 		shutdownEnv = "(not set, using default)"
+	}
+	shutdownTimeEnv := os.Getenv("SHUTDOWN_AFTER_TIME_MS")
+	if shutdownTimeEnv == "" {
+		shutdownTimeEnv = "(not set, using default)"
 	}
 
 	usage := fmt.Sprintf(`
@@ -101,16 +109,18 @@ setInterval(() => {
 <li>CPU Load Percent Setting: %d%%</li>
 <li>Total Memory: %.2f GB</li>
 <li>Memory Usage: %.2f%%</li>
-<li>Memory Load Setting: %.2f GB</li>
+<li>Memory Load Setting: %d MB</li>
 </ul>
 <h2>Environment Variables</h2>
 <ul>
 <li>CPU_LOAD_PERCENT: integer (max 80) - target CPU load percentage <b>(current: %s)</b></li>
-<li>MEMORY_GB: float - target memory load in GB <b>(current: %s)</b></li>
+<li>MEMORY_MB: integer - target memory load in MB <b>(current: %s)</b></li>
 <li>DURATION_SEC: integer (optional) - duration in seconds to run load, 0 means run until stopped <b>(current: %s)</b></li>
 <li>PORT: integer (optional) - server port, default 8080 <b>(current: %s)</b></li>
 <li>CRASH: boolean (optional) - simulate application crash (panic) for CrashLoopBackOff testing <b>(current: %s)</b></li>
+<li>CRASH_AFTER_TIME_MS: integer (optional) - time in milliseconds before auto-crash <b>(current: %s)</b></li>
 <li>SHUTDOWN: boolean (optional) - simulate rolling update/scale down <b>(current: %s)</b></li>
+<li>SHUTDOWN_AFTER_TIME_MS: integer (optional) - time in milliseconds before auto-shutdown <b>(current: %s)</b></li>
 </ul>
 <h2>API Endpoints</h2>
 <table border="1" cellpadding="5" cellspacing="0">
@@ -118,7 +128,7 @@ setInterval(() => {
 <tr><td>/start</td><td>POST</td><td></td><td>Start CPU and/or memory load</td></tr>
 <tr><td>/stop</td><td>POST</td><td></td><td>Stop load</td></tr>
 <tr><td>/status</td><td>GET</td><td></td><td>Get current load status</td></tr>
-<tr><td>/setting</td><td>POST</td><td>{ "cpu_load_percent": int, "memory_gb": float, "duration_sec": int (optional) }</td><td>Update load settings</td></tr>
+<tr><td>/setting</td><td>POST</td><td>{ "cpu_load_percent": int, "memory_mb": int, "duration_sec": int (optional) }</td><td>Update load settings</td></tr>
 <tr><td>/health</td><td>GET</td><td></td><td>Health check</td></tr>
 <tr><td>/database</td><td>POST</td><td>{ "engine": "mysql|postgres|sqlite|dynamodb", "connection_string": "string" }</td><td>Check DB connection</td></tr>
 <tr><td>/error</td><td>GET</td><td></td><td>Simulate error for alert testing</td></tr>
@@ -135,8 +145,8 @@ setInterval(() => {
 		status.CPULoadPercent,
 		float64(vmStat.Total)/1024/1024/1024,
 		vmStat.UsedPercent,
-		status.MemoryGB,
-		cpuLoadEnv, memGBEnv, durationEnv, portEnv)
+		status.MemoryMB,
+		cpuLoadEnv, memMBEnv, durationEnv, portEnv, crashEnv, crashTimeEnv, shutdownEnv, shutdownTimeEnv)
 
 	return c.Type("html").SendString(usage)
 }
@@ -154,7 +164,7 @@ func startHandler(c *fiber.Ctx) error {
 
 	status.Running = true
 	status.CPULoadPercent = settings.CPULoadPercent
-	status.MemoryGB = settings.MemoryGB
+	status.MemoryMB = settings.MemoryMB
 
 	go runLoad(ctx, settings)
 
@@ -172,7 +182,7 @@ func stopHandler(c *fiber.Ctx) error {
 	cancelFunc()
 	status.Running = false
 	status.CPULoadPercent = 0
-	status.MemoryGB = 0
+	status.MemoryMB = 0
 	memoryBlocks = nil
 	atomic.StoreInt32(&cpuLoadActive, 0)
 
@@ -207,11 +217,11 @@ func settingHandler(c *fiber.Ctx) error {
 	}
 
 	settings.CPULoadPercent = newSettings.CPULoadPercent
-	settings.MemoryGB = newSettings.MemoryGB
+	settings.MemoryMB = newSettings.MemoryMB
 	settings.DurationSec = newSettings.DurationSec
 
 	status.CPULoadPercent = settings.CPULoadPercent
-	status.MemoryGB = settings.MemoryGB
+	status.MemoryMB = settings.MemoryMB
 
 	return c.SendString("Settings updated")
 }

@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"runtime"
+	"runtime/debug"
+	"strconv"
 	"sync/atomic"
 	"time"
-	"runtime/debug"
 
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/mem"
@@ -14,8 +16,8 @@ import (
 
 // runLoad starts the load generation based on the provided settings
 func runLoad(ctx context.Context, loadSettings LoadSettings) {
-	log.Printf("Starting load generation: CPU=%d%%, Memory=%.2fGB, Duration=%ds", 
-		loadSettings.CPULoadPercent, loadSettings.MemoryGB, loadSettings.DurationSec)
+	log.Printf("Starting load generation: CPU=%d%%, Memory=%dMB, Duration=%ds",
+		loadSettings.CPULoadPercent, loadSettings.MemoryMB, loadSettings.DurationSec)
 
 	// Create a context with timeout if duration is specified
 	var loadCtx context.Context
@@ -34,8 +36,30 @@ func runLoad(ctx context.Context, loadSettings LoadSettings) {
 	}
 
 	// Start memory load generation if specified
-	if loadSettings.MemoryGB > 0 {
-		go generateMemoryLoad(loadCtx, loadSettings.MemoryGB)
+	if loadSettings.MemoryMB > 0 {
+		go generateMemoryLoad(loadCtx, loadSettings.MemoryMB)
+	}
+
+	// Handle automatic crash if enabled
+	if crashEnv := os.Getenv("CRASH"); crashEnv != "" {
+		if crashEnabled, err := strconv.ParseBool(crashEnv); err == nil && crashEnabled {
+			go func() {
+				time.Sleep(time.Duration(loadSettings.CrashAfterTimeMs) * time.Millisecond)
+				log.Printf("CRASH: Auto-crash triggered after %dms (Exit Code: 1)", loadSettings.CrashAfterTimeMs)
+				panic("Auto-crash triggered by CRASH environment variable")
+			}()
+		}
+	}
+
+	// Handle automatic shutdown if enabled
+	if shutdownEnv := os.Getenv("SHUTDOWN"); shutdownEnv != "" {
+		if shutdownEnabled, err := strconv.ParseBool(shutdownEnv); err == nil && shutdownEnabled {
+			go func() {
+				time.Sleep(time.Duration(loadSettings.ShutdownAfterTimeMs) * time.Millisecond)
+				log.Printf("SHUTDOWN: Auto-shutdown triggered after %dms (Exit Code: 0)", loadSettings.ShutdownAfterTimeMs)
+				os.Exit(0)
+			}()
+		}
 	}
 
 	// Wait for context cancellation
@@ -44,11 +68,11 @@ func runLoad(ctx context.Context, loadSettings LoadSettings) {
 	// Clean up
 	log.Println("Cleaning up load generation...")
 	atomic.StoreInt32(&cpuLoadActive, 0)
-	
+
 	statusMutex.Lock()
 	status.Running = false
 	status.CPULoadPercent = 0
-	status.MemoryGB = 0
+	status.MemoryMB = 0
 	memoryBlocks = nil
 	statusMutex.Unlock()
 
@@ -98,11 +122,11 @@ func generateCPULoad(ctx context.Context, targetPercent int) {
 }
 
 // generateMemoryLoad allocates memory to simulate memory load
-func generateMemoryLoad(ctx context.Context, targetGB float64) {
-	log.Printf("Starting memory load generation, target: %.2fGB", targetGB)
+func generateMemoryLoad(ctx context.Context, targetMB int) {
+	log.Printf("Starting memory load generation, target: %dMB", targetMB)
 
-	// Convert GB to bytes
-	targetBytes := int64(targetGB * 1024 * 1024 * 1024)
+	// Convert MB to bytes
+	targetBytes := int64(targetMB * 1024 * 1024)
 	blockSize := int64(1024 * 1024) // 1MB blocks
 
 	statusMutex.Lock()
@@ -125,7 +149,7 @@ func generateMemoryLoad(ctx context.Context, targetGB float64) {
 
 			// Allocate memory block
 			block := make([]byte, currentBlockSize)
-			
+
 			// Write to the memory to ensure it's actually allocated
 			for i := range block {
 				block[i] = byte(i % 256)
@@ -142,7 +166,7 @@ func generateMemoryLoad(ctx context.Context, targetGB float64) {
 		}
 	}
 
-	log.Printf("Memory allocation completed: %.2fGB", float64(totalAllocated)/1024/1024/1024)
+	log.Printf("Memory allocation completed: %dMB", totalAllocated/1024/1024)
 
 	// Keep the memory allocated until context is cancelled
 	<-ctx.Done()

@@ -23,8 +23,17 @@ FROM alpine:latest
 
 WORKDIR /app
 
+# Add a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 # Copy the built binary from the builder stage
 COPY --from=builder /app/loadsim .
+
+# Change ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
 
 # Expose the port the app runs on
 EXPOSE 8080

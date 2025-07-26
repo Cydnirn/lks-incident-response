@@ -47,15 +47,15 @@ func main() {
 
 	// Routes
 	app.Get("/", rootHandler)
-	app.Post("/start", startHandler)
-	app.Post("/stop", stopHandler)
 	app.Get("/status", statusHandler)
-	app.Post("/setting", settingHandler)
 	app.Get("/health", healthHandler)
-	app.Post("/database", databaseHandler)
 	app.Get("/error", errorHandler)
 	app.Get("/crash", crashHandler)
 	app.Get("/shutdown", makeShutdownHandler(app))
+	app.Post("/start", startHandler)
+	app.Post("/stop", stopHandler)
+	app.Post("/setting", settingHandler)
+	app.Post("/database", databaseHandler)
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")
@@ -108,9 +108,11 @@ func main() {
 func initializeSettings() {
 	// Initialize default settings
 	settings = LoadSettings{
-		CPULoadPercent: 50,
-		MemoryGB:       1.0,
-		DurationSec:    0,
+		CPULoadPercent:      50,
+		MemoryMB:            1024, // 1GB in MB
+		DurationSec:         0,
+		CrashAfterTimeMs:    5000,  // 5 seconds default
+		ShutdownAfterTimeMs: 10000, // 10 seconds default
 	}
 
 	// Override with environment variables if present
@@ -123,9 +125,9 @@ func initializeSettings() {
 		}
 	}
 
-	if memGB := os.Getenv("MEMORY_GB"); memGB != "" {
-		if val, err := strconv.ParseFloat(memGB, 64); err == nil {
-			settings.MemoryGB = val
+	if memMB := os.Getenv("MEMORY_MB"); memMB != "" {
+		if val, err := strconv.Atoi(memMB); err == nil {
+			settings.MemoryMB = val
 		}
 	}
 
@@ -135,14 +137,38 @@ func initializeSettings() {
 		}
 	}
 
-	// Initialize status
-	status = LoadStatus{
-		Running:        false,
-		CPULoadPercent: 0,
-		MemoryGB:       0,
-		DatabaseStatus: "Not tested",
+	// Handle crash environment variable
+	if crashEnv := os.Getenv("CRASH"); crashEnv != "" {
+		if crashEnabled, err := strconv.ParseBool(crashEnv); err == nil && crashEnabled {
+			if crashTime := os.Getenv("CRASH_AFTER_TIME_MS"); crashTime != "" {
+				if val, err := strconv.Atoi(crashTime); err == nil {
+					settings.CrashAfterTimeMs = val
+				}
+			}
+		}
 	}
 
-	log.Printf("Initialized with settings: CPU=%d%%, Memory=%.2fGB, Duration=%ds",
-		settings.CPULoadPercent, settings.MemoryGB, settings.DurationSec)
+	// Handle shutdown environment variable
+	if shutdownEnv := os.Getenv("SHUTDOWN"); shutdownEnv != "" {
+		if shutdownEnabled, err := strconv.ParseBool(shutdownEnv); err == nil && shutdownEnabled {
+			if shutdownTime := os.Getenv("SHUTDOWN_AFTER_TIME_MS"); shutdownTime != "" {
+				if val, err := strconv.Atoi(shutdownTime); err == nil {
+					settings.ShutdownAfterTimeMs = val
+				}
+			}
+		}
+	}
+
+	// Initialize status
+	status = LoadStatus{
+		Running:             false,
+		CPULoadPercent:      0,
+		MemoryMB:            0,
+		DatabaseStatus:      "Not tested",
+		CrashAfterTimeMs:    settings.CrashAfterTimeMs,
+		ShutdownAfterTimeMs: settings.ShutdownAfterTimeMs,
+	}
+
+	log.Printf("Initialized with settings: CPU=%d%%, Memory=%dMB, Duration=%ds, CrashAfter=%dms, ShutdownAfter=%dms",
+		settings.CPULoadPercent, settings.MemoryMB, settings.DurationSec, settings.CrashAfterTimeMs, settings.ShutdownAfterTimeMs)
 }
