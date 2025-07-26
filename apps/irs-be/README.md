@@ -49,17 +49,26 @@ go build -o irs-be cmd/main.go
 The server will start on `http://localhost:8080` (or the port specified in your config).
 
 ## Docker Build
+### Basic Build
 ```bash
 docker build \
   --platform=linux/amd64 \
   --no-cache \
   -t irsbe \
-  -f docker/Dockerfile \
+  .
+```
+### With AWS Credential
+**Note:** you can configure latter for aws credential with os env
+```bash
+docker build \
+  --platform=linux/amd64 \
+  --no-cache \
+  -t irsbe \
   --build-arg AWS_ACCESS_KEY_ID=your_aws_key_id. \
   --build-arg AWS_SECRET_ACCESS_KEY=your_aws_secret \
   --build-arg AWS_SESSION_TOKEN=you_aws_token
   .
-
+```
 ## API Endpoints
 
 ### Health Check
@@ -78,16 +87,24 @@ docker build \
 
 ### Project Structure
 ```
-irs-be/
-├── main.go              # Application entry point
-├── go.mod               # Go module file
-├── config.env           # Environment configuration
-├── models/
-│   └── ticket.go        # Data models
-├── services/
-│   └── dynamodb.go      # DynamoDB service
-└── handlers/
-    └── ticket.go        # HTTP handlers
+.
+├── cmd
+│   └── main.go                  # Application entry point
+├── Dockerfile                   # Docker instructions to build the application image
+├── go.mod                       # Go module definition
+├── go.sum                       # Dependency checksums
+├── internal
+│   ├── config
+│   │   └── config.go            # Manages environment-based configuration
+│   ├── dto
+│   │   └── ticket.go            # Data Transfer Objects for API request/response schemas
+│   ├── handlers
+│   │   └── ticket_handler.go    # HTTP handlers for insident endpoint
+│   ├── models
+│   │   └── ticket.go            # Domain or database models
+│   └── services              
+│       └── ticket_service.go    # Business logic
+└── README.md                    # Project documentation and usage instructions
 ```
 
 ### Building for Production
