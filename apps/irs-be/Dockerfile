@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN go build -o irs-be cmd/main.go
+RUN go build -o irs-backend cmd/main.go
 
 # Final stage
 FROM alpine:latest
@@ -29,7 +29,7 @@ WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy the binary from builder stage
-COPY --from=builder /app/irs-be .
+COPY --from=builder /app/irs-backend .
 
 # Change ownership
 RUN chown -R appuser:appgroup /app
@@ -41,4 +41,4 @@ USER appuser
 EXPOSE 8080
 
 # Run the application
-CMD ["./irs-be"] 
+CMD ["./irs-backend"] 
