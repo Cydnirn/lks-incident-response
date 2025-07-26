@@ -30,6 +30,13 @@ type Config struct {
 	Server   ServerConfig
 }
 
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok && value != "" {
+		return value
+	}
+	return fallback
+}
+
 func LoadConfig() Config {
 	// Load .env file if present
 	if err := godotenv.Load(); err != nil {
@@ -38,18 +45,18 @@ func LoadConfig() Config {
 
 	cfg := Config{
 		AWS: AWSConfig{
-			Region:          os.Getenv("AWS_REGION"),
-			AccessKeyID:     os.Getenv("AWS_ACCESS_KEY_ID"),
-			SecretAccessKey: os.Getenv("AWS_SECRET_ACCESS_KEY"),
-			SessionToken:    os.Getenv("AWS_SESSION_TOKEN"),
+			Region:          getEnv("AWS_REGION", "us-east-1"),
+			AccessKeyID:     getEnv("AWS_ACCESS_KEY_ID", ""),
+			SecretAccessKey: getEnv("AWS_SECRET_ACCESS_KEY", ""),
+			SessionToken:    getEnv("AWS_SESSION_TOKEN", ""),
 		},
 		DynamoDB: DynamoDBConfig{
-			TableName: os.Getenv("DYNAMODB_TABLE_NAME"),
+			TableName: getEnv("DYNAMODB_TABLE_NAME", "insident"),
 		},
 		Server: ServerConfig{
-			Host:       os.Getenv("HOST"),
-			Port:       os.Getenv("PORT"),
-			CORSOrigin: os.Getenv("CORS_ORIGIN"),
+			Host:       getEnv("HOST", "0.0.0.0"),
+			Port:       getEnv("PORT", "8080"),
+			CORSOrigin: getEnv("CORS_ORIGIN", "*"),
 		},
 	}
 

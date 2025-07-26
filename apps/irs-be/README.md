@@ -25,15 +25,14 @@ A Go backend application built with Fiber framework to provide incident ticket d
    ```
 
 2. **Export this AWS credentials to you OS Env variables or create .env:**
-   ```env
-   AWS_REGION=us-east-1
-   AWS_ACCESS_KEY_ID=your_access_key
-   AWS_SECRET_ACCESS_KEY=your_secret_key
-   AWS_SESSION_TOKEN=your_session_token
-   DYNAMODB_TABLE_NAME=insident
-   PORT=8080
-   HOST=0.0.0.0
-   CORS_ORIGIN=http://localhost:5173
+   ```bash
+   export AWS_REGION=us-east-1 # Optional
+   export AWS_ACCESS_KEY_ID=your_access_key # Required
+   export AWS_SECRET_ACCESS_KEY=your_secret_key # Required
+   export AWS_SESSION_TOKEN=your_session_token # Required
+   export DYNAMODB_TABLE_NAME=insident # Optional
+   export PORT=8080 # Optional
+   export HOST=0.0.0.0 # Optional
    ```
 
 ## Running the Application
@@ -42,7 +41,25 @@ A Go backend application built with Fiber framework to provide incident ticket d
 go run main.go
 ```
 
+### Build the Application
+```bash
+go build -o irs-be cmd/main.go
+```
+
 The server will start on `http://localhost:8080` (or the port specified in your config).
+
+## Docker Build
+```bash
+docker build \
+  --platform=linux/amd64 \
+  --no-cache \
+  -t irsbe \
+  -f docker/Dockerfile \
+  --build-arg VITE_AWS_REGION=us-east-1 \
+  --build-arg VITE_AWS_ACCESS_KEY_ID=your_aws_key_id. \
+  --build-arg VITE_AWS_SECRET_ACCESS_KEY=your_aws_secret \
+  --build-arg VITE_AWS_SESSION_TOKEN=you_aws_token
+  .
 
 ## API Endpoints
 

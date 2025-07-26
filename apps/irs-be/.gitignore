@@ -36,3 +36,4 @@ cmd/irs-be/irs-be
 
 # Env files (if you want to keep secrets out of git)
 .env 
+.envrc

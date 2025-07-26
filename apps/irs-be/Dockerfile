@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o irs-backend main.go
+RUN go build -o irs-be cmd/main.go
 
 # Final stage
 FROM alpine:latest
@@ -23,16 +23,22 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
 # Set working directory
-WORKDIR /root/
+WORKDIR /app
+
+# Add a non-root user and group
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Copy the binary from builder stage
-COPY --from=builder /app/irs-backend .
+COPY --from=builder /app/irs-be .
 
-# Copy config file
-COPY --from=builder /app/config.env.example ./config.env
+# Change ownership
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
 
 # Expose port
 EXPOSE 8080
 
 # Run the application
-CMD ["./irs-backend"] 
+CMD ["./irs-be"] 
