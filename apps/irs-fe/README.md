@@ -63,9 +63,8 @@ A modern read-only web application specifically designed for monitoring and trac
 docker build \
   --platform=linux/amd64 \
   --no-cache \
-  -t lks/irs \
+  -t lks/irsfe \
   -f docker/Dockerfile \
-  --build-arg VITE_API_BASE_URL=http://YOUR_BE_SERVICE
   .
 ```
 **Note:** Run in root folder of IRS or apps/irs
