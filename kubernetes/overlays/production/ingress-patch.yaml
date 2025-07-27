@@ -2,16 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: lks-apps-prod-ingress
-  annotations:
-    kubernetes.io/ingress.class: "alb"
-    alb.ingress.kubernetes.io/scheme: "internet-facing"
-    alb.ingress.kubernetes.io/target-type: "ip"
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-    alb.ingress.kubernetes.io/healthcheck-path: "/health"
-    alb.ingress.kubernetes.io/healthcheck-port: "8080"
-    alb.ingress.kubernetes.io/success-codes: "200,302"
-    alb.ingress.kubernetes.io/load-balancer-attributes: "idle_timeout.timeout_seconds=60"
 spec:
+  ingressClassName: alb
   rules:
   - http:
       paths:
@@ -19,6 +11,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: lks-apps-prod-service
+            name: lks-apps-prod-loadsim-service
             port:
               number: 8080 

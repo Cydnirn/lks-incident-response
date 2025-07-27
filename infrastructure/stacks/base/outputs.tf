@@ -38,4 +38,9 @@ output "local_access_security_group_id" {
 output "db_security_group_id" {
   description = "ID of the database security group"
   value       = module.database_sg.security_group_id
+}
+
+output "all_traffict_security_group_id" {
+  description = "ID of the all traffic security group"
+  value       = module.all_traffict_sg.security_group_id
 } 

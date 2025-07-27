@@ -5,7 +5,7 @@
 
 set -e
 
-TABLE_NAME="insident"
+TABLE_NAME="insidents"
 REGION="${AWS_REGION:-us-east-1}"
 
 echo "🚀 Adding dummy incident data to DynamoDB table: $TABLE_NAME"

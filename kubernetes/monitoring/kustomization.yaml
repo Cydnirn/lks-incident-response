@@ -1,6 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: monitoring
+
 resources:
 - irs-be
 - irs-fe
@@ -11,11 +13,11 @@ resources:
 
 images:
   - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsbe
-    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsbe
-    newTag: latest
+    newName: 844331029447.dkr.ecr.us-east-1.amazonaws.com/lks/irsbe
+    newTag: v2
   - name: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsfe
-    newName: 472634532065.dkr.ecr.us-east-1.amazonaws.com/lks/irsfe
-    newTag: latest
+    newName: 844331029447.dkr.ecr.us-east-1.amazonaws.com/lks/irsfe
+    newTag: v1
 
 labels:
   - includeSelectors: true

@@ -7,17 +7,6 @@ namePrefix: lks-apps-prod-
 resources:
 - ../../base
 
-configMapGenerator:
-  - name: loadsim-config
-    literals:
-      - CPU_LOAD_PERCENT=50
-      - MEMORY_MB=256
-      - DURATION_SEC=0
-      - CRASH=false
-      - CRASH_AFTER_TIME_MS=10
-      - SHUTDOWN=false
-      - SHUTDOWN_AFTER_TIME_MS=10
-
 images:
 - name: betuah/loadsim
   newName: betuah/loadsim

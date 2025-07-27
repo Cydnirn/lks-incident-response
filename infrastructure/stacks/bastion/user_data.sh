@@ -155,5 +155,5 @@ ufw disable
 
 # Log completion
 echo "$(date): Bastion NAT instance with WireGuard setup completed" >> /var/log/user-data.log
-echo "WireGuard Easy Web UI: http://$WG_HOST:51821" >> /var/log/user-data.log
-echo "Admin Password: $WG_ADMIN_PASSWORD" >> /var/log/user-data.log
+echo "WireGuard Easy Web UI: http://${wg_host}:51821" >> /var/log/user-data.log
+echo "Admin Password: lkspass" >> /var/log/user-data.log

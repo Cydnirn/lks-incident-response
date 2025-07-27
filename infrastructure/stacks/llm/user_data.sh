@@ -18,7 +18,7 @@ systemctl start ollama
 sleep 10
 
 # Pull the specified model
-ollama pull ${ollama_model}
+ollama pull ${llm_model}
 
 # Create a simple test script
 cat > /home/ubuntu/test_ollama.sh << 'EOF'
@@ -36,7 +36,7 @@ ufw disable
 # Create a systemd service for Ollama (already handled by installer)
 # The installer creates /etc/systemd/system/ollama.service
 
-echo "Ollama installation completed!"
-echo "Model ${ollama_model} has been pulled"
-echo "Ollama API is available on port 11434"
+echo "LLM with Ollama installation completed!"
+echo "Model ${llm_model} has been pulled"
+echo "LLM with Ollama API is available on port 11434"
 echo "Test the installation with: ./test_ollama.sh" 

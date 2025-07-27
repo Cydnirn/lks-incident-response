@@ -17,7 +17,7 @@ locals {
 
 # Create the security group
 resource "aws_security_group" "dynamic_sg" {
-  name_prefix = "${var.project_name}-${var.security_group_name}-"
+  name = "${var.project_name}-${var.security_group_name}"
   description = var.description
   vpc_id      = var.vpc_id
 

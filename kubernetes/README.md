@@ -61,6 +61,9 @@ kubernetes/
 kubectl get pods -n staging
 kubectl get pods -n production
 kubectl get pods -n monitoring
+kubectl get deployments -n monitoring
+kubectl get deployments -n staging
+kubectl get deployments -n production
 
 # View logs
 kubectl logs -f deployment/lks-apps-stage -n staging
@@ -91,14 +94,17 @@ kubectl config delete-context <context-name> # Delete context
 kubectl apply -k monitoring
 kubectl apply -k overlay/production
 kubectl apply -k overlay/staging
+
+# Rollout
+kubectl rollout restart deployment your-deployment-name -n your-namespace
 ```
 
 ### ECR Secret for EKS
 ```bash
 kubectl create secret docker-registry ecr-secret \
-  --docker-server=472634532065.dkr.ecr.us-east-1.amazonaws.com \
+  --docker-server=<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com \
   --docker-username=AWS \
-  --docker-password=$(aws ecr get-login-password --region us-east-1) \
+  --docker-password=$(aws ecr get-login-password --region your_region) \
   --docker-email=none
 ```
 

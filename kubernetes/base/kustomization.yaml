@@ -6,7 +6,10 @@ resources:
 - deployment.yaml
 - service.yaml
 - hpa.yaml
-- ingress.yaml  
+- ingress.yaml
+- ingressclass-alb.yaml
+- ingressclassparams-alb.yaml
+- configmap.yaml
 
 labels:
   - includeSelectors: true

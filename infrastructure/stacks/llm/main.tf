@@ -72,8 +72,8 @@ module "llm_sg" {
   }
 }
 
-# Ollama EC2 Instance
-module "ollama" {
+# LLM EC2 Instance
+module "llm" {
   source = "../../modules/compute/ec2"
   
   project_name           = var.project_name
@@ -92,11 +92,11 @@ module "ollama" {
   root_volume_encrypted = var.llm_root_volume_encrypted
   associate_public_ip_address = true
   user_data = templatefile("${path.module}/user_data.sh", {
-    ollama_model = var.llm_model
+    llm_model = var.llm_model
   })
   
   # Implicit dependency on bastion to ensure NAT routing is ready
-  # This ensures the bastion instance is fully created before creating ollama
+  # This ensures the bastion instance is fully created before creating LLM
   depends_on = [
     data.terraform_remote_state.bastion
   ]

@@ -22,11 +22,6 @@ A modern read-only web application specifically designed for monitoring and trac
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   cd apps/ticket
-   ```
-
 1. **Install dependencies**
    ```bash
    npm install

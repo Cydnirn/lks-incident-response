@@ -4,7 +4,8 @@ metadata:
   name: lks-apps-prod-hpa
 spec:
   scaleTargetRef:
-    name: lks-apps-prod
+    name: lks-apps-prod-loadsim-app
+    kind: Deployment
   minReplicas: 1
   maxReplicas: 3
   metrics:

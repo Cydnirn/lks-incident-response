@@ -41,8 +41,8 @@ func main() {
 		AllowMethods: "GET, POST, PUT, DELETE, OPTIONS",
 	}))
 
-	app.Get("/health", ticketHandler.HealthCheck)
 	api := app.Group("/api")
+	api.Get("/health", ticketHandler.HealthCheck)
 	tickets := api.Group("/tickets")
 	tickets.Get("/", ticketHandler.GetAllTickets)
 	tickets.Get("/:id", ticketHandler.GetTicketByID)
@@ -58,7 +58,7 @@ func main() {
 			"message": "IRS Backend API is running",
 			"version": "1.0.0",
 			"endpoints": fiber.Map{
-				"health":                   "/health",
+				"health":                   "/api/health",
 				"tickets":                  "/api/tickets",
 				"ticket_by_id":             "/api/tickets/:id",
 				"tickets_by_status":        "/api/tickets/status/:status",

@@ -1,24 +1,24 @@
-output "ollama_instance_id" {
-  description = "ID of the Ollama instance"
-  value       = module.ollama.instance_id
+output "llm_instance_id" {
+  description = "ID of the llm instance"
+  value       = module.llm.instance_id
 }
 
-output "ollama_private_ip" {
-  description = "Private IP of the Ollama instance"
-  value       = module.ollama.instance_private_ip
+output "llm_private_ip" {
+  description = "Private IP of the llm instance"
+  value       = module.llm.instance_private_ip
 }
 
-output "ollama_public_ip" {
-  description = "Public IP of the Ollama instance"
-  value       = module.ollama.instance_public_ip
+output "llm_public_ip" {
+  description = "Public IP of the llm instance"
+  value       = module.llm.instance_public_ip
 } 
 
-output "ollama_ssh_command" {
-  description = "SSH command to connect to Ollama instance"
-  value       = module.ollama.ssh_command
+output "llm_ssh_command" {
+  description = "SSH command to connect to llm instance"
+  value       = module.llm.ssh_command
 }
 
-output "ollama_api_url" {
-  description = "URL to access Ollama API"
-  value       = "http://${module.ollama.instance_public_ip}:11434"
+output "llm_api_url" {
+  description = "URL to access llm API"
+  value       = "http://${module.llm.instance_public_ip}:11434"
 } 

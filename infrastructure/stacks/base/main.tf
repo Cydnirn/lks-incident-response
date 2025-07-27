@@ -66,6 +66,27 @@ locals {
         }
       ]
     }
+
+    all = {
+      ingress = [
+        {
+          description = "All traffic from private network"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      ]
+      egress = [
+        {
+          description = "All outbound traffic"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      ]
+    }
   }
 }
 
@@ -106,4 +127,16 @@ module "database_sg" {
   vpc_id              = module.vpc.vpc_id
   ingress_rules       = local.security_group_rules.database.ingress
   egress_rules        = local.security_group_rules.database.egress
+} 
+
+module "all_traffict_sg" {
+  source = "../../modules/network/security-group"
+
+  project_name        = var.project_name
+  security_group_name = "all-traffict-sg"
+  security_group_type = "all"
+  description         = "Security group for all traffic"
+  vpc_id              = module.vpc.vpc_id
+  ingress_rules       = local.security_group_rules.all.ingress
+  egress_rules        = local.security_group_rules.all.egress
 } 
