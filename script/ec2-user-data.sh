@@ -74,7 +74,7 @@ cat > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json << 'EOF'
                 "collect_list": [
                     {
                         "file_path": "/var/log/loadsim/loadsim.log",
-                        "log_group_name": "lks-target-logs",
+                        "log_group_name": "/ec2/lks-target-logs",
                         "log_stream_name": "{instance_id}/lks-target-logs/loadsim"
                     }
                 ]
