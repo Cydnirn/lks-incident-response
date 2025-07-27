@@ -13,14 +13,6 @@ The setup consists of three environments:
 
 ```
 kubernetes/
-├── base
-│   ├── configmap.yaml
-│   ├── deployment.yaml
-│   ├── hpa.yaml
-│   ├── ingress.yaml
-│   ├── kustomization.yaml
-│   ├── namespace.yaml
-│   └── service.yaml
 ├── monitoring
 │   ├── ingress.yaml
 │   ├── irs-be
@@ -39,17 +31,6 @@ kubernetes/
 │   │   ├── namespace.yaml
 │   │   └── service.yaml
 │   └── kustomization.yaml
-├── overlays
-│   ├── production
-│   │   ├── deployment-patch.yaml
-│   │   ├── hpa-patch.yaml
-│   │   ├── ingress-patch.yaml
-│   │   └── kustomization.yaml
-│   └── staging
-│       ├── deployment-patch.yaml
-│       ├── hpa-patch.yaml
-│       ├── ingress-patch.yaml
-│       └── kustomization.yaml
 └── README.md
 ```
 

@@ -2,11 +2,8 @@ package main
 
 import (
 	"context"
-	"log"
-	"os"
 	"runtime"
 	"runtime/debug"
-	"strconv"
 	"sync/atomic"
 	"time"
 
@@ -16,8 +13,11 @@ import (
 
 // runLoad starts the load generation based on the provided settings
 func runLoad(ctx context.Context, loadSettings LoadSettings) {
-	log.Printf("Starting load generation: CPU=%d%%, Memory=%dMB, Duration=%ds",
-		loadSettings.CPULoadPercent, loadSettings.MemoryMB, loadSettings.DurationSec)
+	logInfo("Starting load generation", map[string]interface{}{
+		"cpu_load_percent": loadSettings.CPULoadPercent,
+		"memory_mb":        loadSettings.MemoryMB,
+		"duration_sec":     loadSettings.DurationSec,
+	})
 
 	// Create a context with timeout if duration is specified
 	var loadCtx context.Context
@@ -40,33 +40,11 @@ func runLoad(ctx context.Context, loadSettings LoadSettings) {
 		go generateMemoryLoad(loadCtx, loadSettings.MemoryMB)
 	}
 
-	// Handle automatic crash if enabled
-	if crashEnv := os.Getenv("CRASH"); crashEnv != "" {
-		if crashEnabled, err := strconv.ParseBool(crashEnv); err == nil && crashEnabled {
-			go func() {
-				time.Sleep(time.Duration(loadSettings.CrashAfterTimeMs) * time.Millisecond)
-				log.Printf("CRASH: Auto-crash triggered after %dms (Exit Code: 1)", loadSettings.CrashAfterTimeMs)
-				panic("Auto-crash triggered by CRASH environment variable")
-			}()
-		}
-	}
-
-	// Handle automatic shutdown if enabled
-	if shutdownEnv := os.Getenv("SHUTDOWN"); shutdownEnv != "" {
-		if shutdownEnabled, err := strconv.ParseBool(shutdownEnv); err == nil && shutdownEnabled {
-			go func() {
-				time.Sleep(time.Duration(loadSettings.ShutdownAfterTimeMs) * time.Millisecond)
-				log.Printf("SHUTDOWN: Auto-shutdown triggered after %dms (Exit Code: 0)", loadSettings.ShutdownAfterTimeMs)
-				os.Exit(0)
-			}()
-		}
-	}
-
 	// Wait for context cancellation
 	<-loadCtx.Done()
 
 	// Clean up
-	log.Println("Cleaning up load generation...")
+	logInfo("Cleaning up load generation", nil)
 	atomic.StoreInt32(&cpuLoadActive, 0)
 
 	statusMutex.Lock()
@@ -76,7 +54,7 @@ func runLoad(ctx context.Context, loadSettings LoadSettings) {
 	memoryBlocks = nil
 	statusMutex.Unlock()
 
-	log.Println("Load generation stopped")
+	logInfo("Load generation stopped", nil)
 }
 
 // generateCPULoad creates CPU load by running busy loops
@@ -84,7 +62,10 @@ func generateCPULoad(ctx context.Context, targetPercent int) {
 	numCPU := runtime.NumCPU()
 	atomic.StoreInt32(&cpuLoadActive, 1)
 
-	log.Printf("Starting CPU load generation on %d cores, target: %d%%", numCPU, targetPercent)
+	logInfo("Starting CPU load generation", map[string]interface{}{
+		"num_cores":      numCPU,
+		"target_percent": targetPercent,
+	})
 
 	// Start a goroutine for each CPU core
 	for i := 0; i < numCPU; i++ {
@@ -123,7 +104,9 @@ func generateCPULoad(ctx context.Context, targetPercent int) {
 
 // generateMemoryLoad allocates memory to simulate memory load
 func generateMemoryLoad(ctx context.Context, targetMB int) {
-	log.Printf("Starting memory load generation, target: %dMB", targetMB)
+	logInfo("Starting memory load generation", map[string]interface{}{
+		"target_mb": targetMB,
+	})
 
 	// Convert MB to bytes
 	targetBytes := int64(targetMB * 1024 * 1024)
@@ -166,7 +149,9 @@ func generateMemoryLoad(ctx context.Context, targetMB int) {
 		}
 	}
 
-	log.Printf("Memory allocation completed: %dMB", totalAllocated/1024/1024)
+	logInfo("Memory allocation completed", map[string]interface{}{
+		"allocated_mb": totalAllocated / 1024 / 1024,
+	})
 
 	// Keep the memory allocated until context is cancelled
 	<-ctx.Done()
@@ -179,24 +164,33 @@ func generateMemoryLoad(ctx context.Context, targetMB int) {
 	runtime.GC()
 	debug.FreeOSMemory()
 
-	log.Println("Memory load generation stopped")
+	logInfo("Memory load generation stopped", nil)
 }
 
 // updateSystemStatus updates the current system status information
 func updateSystemStatus() {
 	// Get CPU usage
 	cpuPercent, err := cpu.Percent(time.Second, false)
-	if err == nil && len(cpuPercent) > 0 {
-		// CPU percentage is already calculated by gopsutil
+	if err != nil {
+		logError("Failed to get CPU usage", err, 500)
+		return
+	}
+
+	if len(cpuPercent) > 0 {
+		logDebug("CPU usage updated", map[string]interface{}{
+			"cpu_percent": cpuPercent[0],
+		})
 	}
 
 	// Get memory usage
-	_, err = mem.VirtualMemory()
-	if err == nil {
-		// Memory usage percentage and used memory are available
-		// The actual system metrics are used directly in the handlers
+	vmStat, err := mem.VirtualMemory()
+	if err != nil {
+		logError("Failed to get memory usage", err, 500)
+		return
 	}
 
-	// Note: The actual system metrics are used in the handlers
-	// This function can be extended to store these values if needed
+	logDebug("Memory usage updated", map[string]interface{}{
+		"memory_used_percent": vmStat.UsedPercent,
+		"memory_total_gb":     float64(vmStat.Total) / 1024 / 1024 / 1024,
+	})
 }
