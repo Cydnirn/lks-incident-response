@@ -185,6 +185,7 @@ def extract_logs_data(alarm_data, alarm_name, incident_type):
             "/var/log/application",
             "/var/log/app.log",
             "/aws/apigateway/execution",
+            "/ec2/lks-target-logs"
             f"/application/{incident_type.lower()}"
         ]
         

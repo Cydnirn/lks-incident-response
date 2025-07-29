@@ -12,13 +12,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Set environment variables
-ARG VITE_AWS_REGION
-ARG VITE_DYNAMODB_TABLE_NAME
-ARG VITE_USE_MOCK_DATA
-
-ENV VITE_AWS_REGION=us-east-1
-ENV VITE_DYNAMODB_TABLE_NAME=incident
-ENV VITE_USE_MOCK_DATA=false
+ARG VITE_API_BASE_URL
 
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules

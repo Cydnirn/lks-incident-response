@@ -51,8 +51,8 @@ locals {
         {
           description = "All traffic from private network"
           from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
+          to_port     = 5432
+          protocol    = "tcp"
           cidr_blocks = [var.vpc_cidr]
         }
       ]

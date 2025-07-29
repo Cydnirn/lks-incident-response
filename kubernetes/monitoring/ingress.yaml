@@ -6,32 +6,7 @@ metadata:
   labels:
     app: lks-irs-ingress
     environment: monitoring
-  # annotations:
-  #   # kubernetes.io/ingress.class: "alb"
-  #   alb.ingress.kubernetes.io/scheme: "internet-facing"
-  #   alb.ingress.kubernetes.io/target-type: "ip"
-  #   alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-  #   # alb.ingress.kubernetes.io/healthcheck-path: "/health"
-  #   # alb.ingress.kubernetes.io/healthcheck-port: "8080"
-  #   # alb.ingress.kubernetes.io/success-codes: "200,302"
 spec:
   ingressClassName: alb
   rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: lks-irs-fe-service
-            port:
-              number: 8080
-  - http:
-      paths:
-      - path: /api/
-        pathType: Prefix
-        backend:
-          service:
-            name: lks-irs-be-service
-            port:
-              number: 8080
+  # Create your rules here

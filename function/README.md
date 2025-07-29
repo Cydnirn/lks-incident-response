@@ -18,7 +18,7 @@ The Lambda functions are designed to work together in a serverless architecture 
 - **lks-cloudwatch-alarm.py** - Processes CloudWatch alarms and identifies incident types
 - **lks-incident-creation.py** - Creates incidents from CloudWatch alarm events
 - **lks-incident-report.py** - Generates AI-powered incident reports
-- **lks-incident-notification-button.py** - Sends email notifications with action buttons
+- **lks-incident-notification-confirm.py** - Sends email notifications with action buttons
 
 ### 2. AI/ML & Analytics
 - **lks-vector-embeding.py** - Creates vector embeddings for solved incidents for similarity search and analysis
@@ -44,7 +44,7 @@ The Lambda functions are designed to work together in a serverless architecture 
 | **lks-cloudwatch-alarm.py** | SNS event with CloudWatch alarm data | `{statusCode: 200/500, body: string}` | `STEP_FUNCTION_ARN` | Processes CloudWatch alarms via SNS, identifies incident types, extracts instance and metrics data, and triggers Step Function for incident creation. |
 | **lks-incident-creation.py** | CloudWatch alarm event or test event with `alarm_name`, `reason`, `metric_name`, `threshold`, `instance_id` | `{statusCode: 200, incidentId: string, incident: object}` | `INCIDENTS_TABLE` | Creates incident records in DynamoDB from CloudWatch alarm events. Determines incident type, severity, and affected services automatically. |
 | **lks-incident-report.py** | `{incidentId: string}` | `{statusCode: 200, incidentId: string, reportGenerated: boolean}` | `INCIDENTS_TABLE`, `OLLAMA_ENDPOINT`, `OLLAMA_MODEL` | Generates comprehensive incident reports using Ollama LLM. Analyzes incident details and provides technical analysis, root cause analysis, and actionable suggestions. |
-| **lks-incident-notification-button.py** | `{incidentId: string}` | `{statusCode: 200, incidentId: string, emailSent: boolean}` | `INCIDENTS_TABLE`, `SNS_TOPIC_ARN`, `API_GATEWAY_URL` | Sends HTML email notifications with action buttons for manual or automatic incident resolution. Includes incident details, severity indicators, and direct action links. |
+| **lks-incident-notification-confirm.py** | `{incidentId: string}` | `{statusCode: 200, incidentId: string, emailSent: boolean}` | `INCIDENTS_TABLE`, `SNS_TOPIC_ARN`, `API_GATEWAY_URL` | Sends HTML email notifications with action buttons for manual or automatic incident resolution. Includes incident details, severity indicators, and direct action links. |
 | **lks-vector-embeding.py** | Kinesis event with incident data or direct incident object | `{statusCode: 200/500, body: string}` | `OLLAMA_ENDPOINT`, `OLLAMA_MODEL`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` | Creates vector embeddings for solved/closed incidents using Ollama LLM. Stores embeddings in PostgreSQL with pgvector extension for similarity search and incident analysis. |
 | **lks-apigw-mail-action.py** | API Gateway event with query params `id` and `action` | `{statusCode: 200/400/404/500, headers: object, body: string}` | `INCIDENT_TABLE`, `STEP_FUNCTION_ARN` | API Gateway handler that processes manual/auto action requests. For manual actions, updates incident status to resolved. For auto actions, triggers Step Function with instance details. |
 | **lks-handle-cpu.py** | `{instance_id: string, incident_id: string, incident_type?: string}` | `{instance_id: string, incident_id: string, status: string, old_instance_type?: string, new_instance_type?: string, was_running?: boolean, error?: string}` | None | Resizes EC2 instances to handle high CPU utilization. Stops instance, modifies instance type to m5.large, and restarts if it was running. |
@@ -166,7 +166,7 @@ Each function can be tested individually using the AWS Lambda console or AWS CLI
 1. **Detection**: CloudWatch alarms trigger `lks-cloudwatch-alarm.py` via SNS
 2. **Processing**: `lks-cloudwatch-alarm.py` identifies incident type and triggers Step Function
 3. **Creation**: Step Function calls `lks-incident-creation.py` to create incident record
-4. **Notification**: `lks-incident-notification-button.py` sends email with action buttons
+4. **Notification**: `lks-incident-notification-confirm.py` sends email with action buttons
 5. **Response**: Based on incident type, appropriate handler is triggered:
    - CPU/Memory: Instance resize via `lks-handle-cpu.py` or `lks-handle-mem.py`
    - Crash/Shutdown: Service restart via `lks-handle-crash.py` or `lks-handle-shutdown.py`
