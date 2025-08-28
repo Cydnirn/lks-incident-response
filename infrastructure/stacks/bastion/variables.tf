@@ -25,7 +25,7 @@ variable "bastion_instance_type" {
 variable "bastion_key_name" {
   description = "Name of the key pair for bastion host"
   type        = string
-  default     = "vockey"
+  default     = "LLM"
 }
 
 variable "bastion_root_volume_size" {
@@ -51,4 +51,4 @@ variable "wg_admin_password" {
   type        = string
   default     = "$$2a$12$8PtK.pNSIcSu02vpUvK3sOxcIDG5rjI6z/nTC4Gm7PSmRxl9Gqcjm"
   sensitive   = true
-} 
+}

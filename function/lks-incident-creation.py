@@ -13,22 +13,22 @@ def lambda_handler(event, context):
     """
     try:
         print(f"Received event: {json.dumps(event)}")
-        
+
         # Parse CloudWatch event (from Step Function or direct)
         if event.get('source') == 'cloudwatch_alarm':
             alarm_data = parse_stepfunction_event(event)
         else:
             alarm_data = parse_cloudwatch_event(event)
-        
+
         # Determine incident properties
         incident_type = alarm_data.get('incident_type') or determine_incident_type(alarm_data['alarm_name'], alarm_data['metric_name'])
         severity = determine_severity(incident_type, alarm_data['threshold'])
         affected_services = determine_affected_services(alarm_data['instance_id'])
         environment = determine_environment(alarm_data['instance_id'])
-        
+
         # Create incident record
         incident_id = f"INC-{datetime.utcnow().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8].upper()}"
-        
+
         incident = {
             'id': incident_id,
             'instance_id': alarm_data['instance_id'],
@@ -47,15 +47,15 @@ def lambda_handler(event, context):
             'affectedServices': affected_services,
             'tags': generate_tags(incident_type, environment)
         }
-        
+
         # Add suggestions based on incident type and data
         incident['suggestions'] = generate_suggestions(incident_type, alarm_data)
-        
+
         # Save to DynamoDB
-        response = incidents_table.put_item(Item=incident)
-        
+        incidents_table.put_item(Item=incident)
+
         print(f"Created incident: {incident_id}")
-        
+
         # Return data for next step in Step Function
         return {
             'statusCode': 200,
@@ -67,7 +67,7 @@ def lambda_handler(event, context):
             'alarm_data': alarm_data,
             'incident': incident
         }
-        
+
     except Exception as e:
         print(f"Error creating incident: {str(e)}")
         raise e
@@ -129,7 +129,7 @@ def determine_incident_type(alarm_name, metric_name):
     """Determine incident type from alarm name and metric"""
     alarm_lower = alarm_name.lower()
     metric_lower = metric_name.lower()
-    
+
     if 'cpu_high' in alarm_lower or 'cpu' in metric_lower:
         return 'CPU_HIGH'
     elif 'mem_high' in alarm_lower or 'memory' in alarm_lower or 'mem' in metric_lower:
@@ -175,7 +175,7 @@ def determine_affected_services(instance_id):
     """Determine affected services from instance ID"""
     if instance_id == 'unknown':
         return ['unknown-service']
-        
+
     ec2 = boto3.client('ec2')
     try:
         response = ec2.describe_instances(InstanceIds=[instance_id])
@@ -194,7 +194,7 @@ def determine_environment(instance_id):
     """Determine environment from instance tags"""
     if instance_id == 'unknown':
         return 'production'
-        
+
     ec2 = boto3.client('ec2')
     try:
         response = ec2.describe_instances(InstanceIds=[instance_id])
@@ -224,14 +224,14 @@ def generate_title(incident_type, alarm_name):
 def generate_initial_report(alarm_data, incident_type):
     """Generate initial report with available data"""
     report_parts = [f"Incident auto-detected from CloudWatch alarm: {alarm_data['alarm_name']}"]
-    
+
     # Add metrics data for CPU/MEM incidents
     if incident_type in ['CPU_HIGH', 'MEM_HIGH'] and alarm_data.get('metrics_data'):
         metrics = alarm_data['metrics_data']
         report_parts.append(f"Metric: {metrics.get('metric_name', 'Unknown')}")
         report_parts.append(f"Threshold: {metrics.get('threshold', 'Unknown')}")
         report_parts.append(f"Comparison: {metrics.get('comparison_operator', 'Unknown')}")
-    
+
     # Add logs data for APP incidents
     elif incident_type.startswith('APP_') and alarm_data.get('logs_data'):
         logs = alarm_data['logs_data']
@@ -241,10 +241,10 @@ def generate_initial_report(alarm_data, incident_type):
                 report_parts.append("Recent error samples:")
                 for event in logs['error_events'][:3]:  # Show first 3 errors
                     report_parts.append(f"- {event.get('message', '')[:100]}...")
-    
+
     report_parts.append(f"Instance: {alarm_data['instance_id']}")
     report_parts.append(f"Triggered at: {alarm_data.get('timestamp', 'Unknown')}")
-    
+
     return ". ".join(report_parts)
 
 
@@ -282,30 +282,30 @@ def generate_suggestions(incident_type, alarm_data):
             'Restart application services'
         ]
     }
-    
+
     suggestions = base_suggestions.get(incident_type, ['Investigate the issue', 'Check system logs'])
-    
+
     # Add data-specific suggestions
     if alarm_data.get('metrics_data'):
         metrics = alarm_data['metrics_data']
         if metrics.get('threshold', 0) > 90:
             suggestions.insert(0, 'URGENT: Threshold exceeded 90% - immediate action required')
-    
+
     if alarm_data.get('logs_data') and alarm_data['logs_data'].get('error_events'):
         suggestions.insert(0, 'Check recent error logs for specific error messages')
-    
+
     return suggestions
 
 
 def generate_tags(incident_type, environment):
     """Generate tags for incident"""
     tags = [incident_type.lower(), environment, 'cloudwatch-auto']
-    
+
     if incident_type in ['CPU_HIGH', 'MEM_HIGH']:
         tags.extend(['resource', 'performance'])
     elif incident_type in ['APP_CRASH', 'APP_SHUTDOWN']:
         tags.extend(['availability', 'application'])
     elif incident_type == 'APP_ERROR':
         tags.extend(['application', 'error'])
-    
+
     return tags

@@ -33,24 +33,24 @@ print_error() {
 deploy_stack() {
     local stack_name=$1
     local stack_path="stacks/$stack_name"
-    
+
     print_status "Deploying $stack_name stack..."
-    
+
     if [ ! -d "$stack_path" ]; then
         print_error "Stack directory $stack_path not found!"
         exit 1
     fi
-    
+
     cd "$stack_path"
-    
+
     # Initialize Terraform
     print_status "Initializing Terraform..."
     terraform init
-    
+
     # Apply the deployment
     print_status "Applying deployment..."
     terraform apply -auto-approve
-    
+
     cd - > /dev/null
     print_success "$stack_name stack deployed successfully!"
 }
@@ -59,24 +59,24 @@ deploy_stack() {
 destroy_stack() {
     local stack_name=$1
     local stack_path="stacks/$stack_name"
-    
+
     print_status "Destroying $stack_name stack..."
-    
+
     if [ ! -d "$stack_path" ]; then
         print_error "Stack directory $stack_path not found!"
         exit 1
     fi
-    
+
     cd "$stack_path"
-    
+
     # Initialize Terraform
     print_status "Initializing Terraform..."
     terraform init
-    
+
     # Destroy the stack
     print_status "Destroying stack..."
     terraform destroy -auto-approve
-    
+
     cd - > /dev/null
     print_success "$stack_name stack destroyed successfully!"
 }
@@ -85,31 +85,31 @@ destroy_stack() {
 plan_stack() {
     local stack_name=$1
     local stack_path="stacks/$stack_name"
-    
+
     print_status "Planning $stack_name stack..."
-    
+
     if [ ! -d "$stack_path" ]; then
         print_error "Stack directory $stack_path not found!"
         exit 1
     fi
-    
+
     cd "$stack_path"
-    
+
     # Initialize Terraform
     print_status "Initializing Terraform..."
     terraform init
-    
+
     # Plan the deployment
     print_status "Planning deployment..."
     terraform plan
-    
+
     cd - > /dev/null
 }
 
 # Function to show status
 show_status() {
     print_status "Checking status of all stacks..."
-    
+
     for stack in base bastion llm; do
         local stack_path="stacks/$stack"
         if [ -d "$stack_path" ]; then
@@ -146,6 +146,7 @@ show_usage() {
     echo "  base              Base infrastructure (VPC, Security Groups)"
     echo "  bastion           Bastion host with NAT gateway"
     echo "  llm               LLM compute instance"
+    echo "  target            Target compute instance"
     echo "  all               All stacks (deploy/destroy only)"
     echo ""
     echo "Examples:"
@@ -159,7 +160,7 @@ show_usage() {
 main() {
     local command=$1
     local stack=$2
-    
+
     case $command in
         "deploy")
             case $stack in
@@ -172,10 +173,18 @@ main() {
                 "llm")
                     deploy_stack "llm"
                     ;;
+                "target")
+                    deploy_stack "target-ec2"
+                    ;;
+                "lambda")
+                    deploy_stack "lambdas"
+                    ;;
                 "all")
                     deploy_stack "base"
                     deploy_stack "bastion"
                     deploy_stack "llm"
+                    deploy_stack "target-ec2"
+                    deploy_stack "lambdas"
                     ;;
                 *)
                     print_error "Invalid stack: $stack"
@@ -193,6 +202,7 @@ main() {
                     if [[ $REPLY =~ ^[Yy]$ ]]; then
                         destroy_stack "llm"
                         destroy_stack "bastion"
+                        destroy_stack "target-ec2"
                         destroy_stack "base"
                     else
                         print_status "Destroy cancelled."
@@ -204,6 +214,12 @@ main() {
                 "llm")
                     destroy_stack "llm"
                     ;;
+                "target")
+                    destroy_stack "target-ec2"
+                    ;;
+                "lambda")
+                    deploy_stack "lambdas"
+                    ;;
                 "all")
                     print_warning "This will destroy ALL infrastructure!"
                     read -p "Are you sure? (y/N): " -n 1 -r
@@ -212,6 +228,8 @@ main() {
                         destroy_stack "llm"
                         destroy_stack "bastion"
                         destroy_stack "base"
+                        destroy_stack "target"
+                        destroy_stack "lambda"
                     else
                         print_status "Destroy cancelled."
                     fi
@@ -250,4 +268,4 @@ main() {
 }
 
 # Run main function with all arguments
-main "$@" 
+main "$@"

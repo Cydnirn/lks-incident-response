@@ -11,7 +11,7 @@ output "llm_private_ip" {
 output "llm_public_ip" {
   description = "Public IP of the llm instance"
   value       = module.llm.instance_public_ip
-} 
+}
 
 output "llm_ssh_command" {
   description = "SSH command to connect to llm instance"
@@ -20,5 +20,5 @@ output "llm_ssh_command" {
 
 output "llm_api_url" {
   description = "URL to access llm API"
-  value       = "http://${module.llm.instance_public_ip}:11434"
-} 
+  value       = "http://${module.llm.instance_private_ip}:11434"
+}

@@ -29,7 +29,7 @@ module "bastion_sg" {
   security_group_type = "bastion"
   description         = "Security group for bastion host"
   vpc_id              = data.terraform_remote_state.base.outputs.vpc_id
-  
+
   ingress_rules = [
     {
       description = "SSH from anywhere"
@@ -60,7 +60,7 @@ module "bastion_sg" {
       cidr_blocks = [data.terraform_remote_state.base.outputs.vpc_cidr_block]
     },
   ]
-  
+
   egress_rules = [
     {
       description = "All outbound traffic"
@@ -70,18 +70,18 @@ module "bastion_sg" {
       cidr_blocks = ["0.0.0.0/0"]
     }
   ]
-  
+
   tags = {
-    Name = "${var.project_name}-bastion-sg"
+    Name    = "${var.project_name}-bastion-sg"
     Project = var.project_name
-    Owner = "lks-team"
+    Owner   = "lks-team"
   }
 }
 
 # Bastion EC2 Instance
 module "bastion" {
   source = "../../modules/compute/ec2"
-  
+
   project_name          = var.project_name
   instance_name         = "bastion-host"
   ami                   = var.bastion_ami
@@ -89,14 +89,14 @@ module "bastion" {
   key_name              = var.bastion_key_name
   security_group_ids    = [module.bastion_sg.security_group_id]
   subnet_id             = data.terraform_remote_state.base.outputs.public_subnet_1_id
-  iam_instance_profile  = "LabInstanceProfile"
-  source_dest_check     = false 
+  iam_instance_profile  = "EC2SSM"
+  source_dest_check     = false
   root_volume_size      = var.bastion_root_volume_size
   root_volume_type      = var.bastion_root_volume_type
   root_volume_encrypted = var.bastion_root_volume_encrypted
   create_eip            = true
-  user_data             = templatefile("${path.module}/user_data.sh", {
-    wg_host             = module.bastion.instance_eip
+  user_data = templatefile("${path.module}/user_data.sh", {
+    wg_host = module.bastion.instance_eip
   })
 }
 
@@ -110,9 +110,9 @@ resource "aws_route_table" "private_rt_with_nat" {
   }
 
   tags = {
-    Name = "${var.project_name}-private-rt-nat"
+    Name    = "${var.project_name}-private-rt-nat"
     Project = var.project_name
-    Owner = "lks-team"
+    Owner   = "lks-team"
   }
 }
 
@@ -126,4 +126,4 @@ resource "aws_route_table_association" "private_rta_1" {
 resource "aws_route_table_association" "private_rta_2" {
   subnet_id      = data.terraform_remote_state.base.outputs.private_subnet_2_id
   route_table_id = aws_route_table.private_rt_with_nat.id
-} 
+}

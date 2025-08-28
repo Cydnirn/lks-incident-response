@@ -10,44 +10,38 @@ variable "project_name" {
   default     = "lks"
 }
 
-variable "llm_ami" {
-  description = "AMI ID for the Ollama instance"
+variable "target_ami" {
+  description = "AMI ID for the target instance"
   type        = string
-  default     = "ami-020cba7c55df1f615"
+  default     = "ami-0360c520857e3138f"
 }
 
-variable "llm_instance_type" {
-  description = "EC2 instance type for Ollama"
+variable "target_instance_type" {
+  description = "EC2 instance type for target"
   type        = string
-  default     = "m5.large"
+  default     = "t3.micro"
 }
 
-variable "llm_key_name" {
-  description = "Key pair name for SSH access to Ollama"
+variable "target_key_name" {
+  description = "Key pair name for SSH access to target"
   type        = string
   default     = "LLM"
 }
 
-variable "llm_root_volume_size" {
+variable "target_root_volume_size" {
   description = "Size of the root volume in GB for Ollama"
   type        = number
-  default     = 30
+  default     = 8
 }
 
-variable "llm_root_volume_type" {
+variable "target_root_volume_type" {
   description = "Type of the root volume for Ollama"
   type        = string
   default     = "gp3"
 }
 
-variable "llm_root_volume_encrypted" {
+variable "target_root_volume_encrypted" {
   description = "Whether to encrypt the root volume for Ollama"
   type        = bool
   default     = true
-}
-
-variable "llm_model" {
-  description = "Ollama model to pull"
-  type        = string
-  default     = "phi4-mini"
 }
