@@ -90,7 +90,7 @@ module "llm" {
   root_volume_size            = var.llm_root_volume_size
   root_volume_type            = var.llm_root_volume_type
   root_volume_encrypted       = var.llm_root_volume_encrypted
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   user_data = templatefile("${path.module}/user_data.sh", {
     llm_model = var.llm_model
   })

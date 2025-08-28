@@ -82,19 +82,20 @@ module "bastion_sg" {
 module "bastion" {
   source = "../../modules/compute/ec2"
 
-  project_name          = var.project_name
-  instance_name         = "bastion-host"
-  ami                   = var.bastion_ami
-  instance_type         = var.bastion_instance_type
-  key_name              = var.bastion_key_name
-  security_group_ids    = [module.bastion_sg.security_group_id]
-  subnet_id             = data.terraform_remote_state.base.outputs.public_subnet_1_id
-  iam_instance_profile  = "EC2SSM"
-  source_dest_check     = false
-  root_volume_size      = var.bastion_root_volume_size
-  root_volume_type      = var.bastion_root_volume_type
-  root_volume_encrypted = var.bastion_root_volume_encrypted
-  create_eip            = true
+  project_name                = var.project_name
+  instance_name               = "bastion-host"
+  ami                         = var.bastion_ami
+  instance_type               = var.bastion_instance_type
+  key_name                    = var.bastion_key_name
+  security_group_ids          = [module.bastion_sg.security_group_id]
+  subnet_id                   = data.terraform_remote_state.base.outputs.public_subnet_1_id
+  iam_instance_profile        = "EC2SSM"
+  source_dest_check           = false
+  root_volume_size            = var.bastion_root_volume_size
+  root_volume_type            = var.bastion_root_volume_type
+  root_volume_encrypted       = var.bastion_root_volume_encrypted
+  create_eip                  = true
+  associate_public_ip_address = true
   user_data = templatefile("${path.module}/user_data.sh", {
     wg_host = module.bastion.instance_eip
   })

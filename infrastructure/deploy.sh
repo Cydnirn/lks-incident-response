@@ -218,7 +218,7 @@ main() {
                     destroy_stack "target-ec2"
                     ;;
                 "lambda")
-                    deploy_stack "lambdas"
+                    destroy_stack "lambdas"
                     ;;
                 "all")
                     print_warning "This will destroy ALL infrastructure!"
